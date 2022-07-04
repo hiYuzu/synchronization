@@ -1,0 +1,78 @@
+<?xml version="1.0" ?>
+<configuration debug="false">
+
+    <!-- 彩色日志配置 -->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+    <!-- 彩色日志格式 -->
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){green} %clr(%-40.40logger{39}){cyan} %clr(:){blue} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+    <!-- 日志控制台输出设置 -->
+
+    <!--控制台日志 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                <!--日志输出格式-->
+                ${CONSOLE_LOG_PATTERN}
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- INFO级别日志,记录INFO级别及比INFO更高级别的日志-->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                <!--日志引文件路径-->
+                logs\%d{yyyy-MM-dd}\sinosoft.log
+            </fileNamePattern>
+            <!-- 日志保存15天，超过15天自动删除 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                <!--日志输出格式-->
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- ERROR级别日志,只记录Error级别日志 -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器,只记录ERROR级别的日志,如果日志级别等于配置级别，过滤器会根据onMath 和 onMismatch接收或拒绝日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                <!--日志文件路径-->
+                logs\%d{yyyy-MM-dd}\sinosoft_error.log
+            </fileNamePattern>
+            <!-- 日志保存15天，超过15天自动删除 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                <!--日志输出格式-->
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- 下面配置一些第三方包的日志过滤级别，用于避免刷屏 -->
+    <logger name="org.springframework" level="WARN" />
+
+    <root>
+        <!-- 日志级别 -->
+        <level value="INFO"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="INFO"/>
+        <appender-ref ref="ERROR"/>
+    </root>
+</configuration>
