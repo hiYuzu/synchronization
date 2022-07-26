@@ -1,5 +1,6 @@
 package com.sinosoft.synchronization.task;
 
+import com.sinosoft.synchronization.util.TaskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +22,7 @@ public class SynchronizationTask {
     /**
      * 每小时40分钟同步上一个小时的刷验核酸数据
      */
-    @Scheduled(cron = "0 40 * * * ?")
+//    @Scheduled(cron = "0 10 * * * ?")
     public void startSynchronize() {
         try {
             Calendar calendar1h40 = Calendar.getInstance();
@@ -36,7 +37,7 @@ public class SynchronizationTask {
             String currentString = formatter.format(calendar40.getTime());
 
             LOG.info("本次查询日期段：" + oldString + " 至 " + currentString);
-            File file = createLogFile(calendar1h40);
+            File file = TaskUtil.createLogFile(calendar1h40, LOG);
 
             // 命令执行--同步支付宝核酸、微信核酸
             String baseShell1 = "python datax.py --jvm=\"-Xms3G -Xmx6G\" hbjkm_hsxx_sztx_zfb.json";
@@ -62,7 +63,7 @@ public class SynchronizationTask {
     /**
      * 每天1点0分同步昨天的刷验与核酸数据
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0 1 * * ?")
     public void syncAll() {
         try {
             Calendar calendar1d1h = Calendar.getInstance();
@@ -76,7 +77,7 @@ public class SynchronizationTask {
             String currentString = formatter.format(calendar0d1h.getTime());
 
             LOG.info("本次查询日期段：" + oldString + " 至 " + currentString);
-            File file = createLogFile(calendar1d1h);
+            File file = TaskUtil.createLogFile(calendar1d1h, LOG);
 
             // 命令执行--同步全量刷验信息，微信端核酸，支付宝端核酸
             String baseShell = "python datax.py --jvm=\"-Xms3G -Xmx6G\" t_hbjkm_pass_record_ds_all_ds.json";
@@ -102,21 +103,5 @@ public class SynchronizationTask {
             LOG.error("执行错误:" + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    private File createLogFile(Calendar calendar1d30) throws Exception {
-        // 日志时间
-        SimpleDateFormat logFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        // 日志文件路径
-        String logPathName = "/data/datax/execute_log/corn_logbus_clue_atta_log.";
-        String logFileName = logPathName + logFormatter.format(calendar1d30.getTime());
-        File file = new File(logFileName);
-        if (!file.exists()) {
-            if (!file.createNewFile()) {
-                throw new Exception("日志文件创建失败");
-            }
-            LOG.info("日志文件创建完成:" + file.getName());
-        }
-        return file;
     }
 }
